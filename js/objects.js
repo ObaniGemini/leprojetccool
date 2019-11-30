@@ -1,7 +1,8 @@
 class Canvas {
 	constructor() {
-		this.canvas = document.getElementById("canvas");
-		this.ctx = this.canvas.getContext("2d");
+		this.canvas = document.createElement( "canvas" );
+		this.ctx = this.canvas.getContext( "2d" );
+		document.body.appendChild( this.canvas );
 		this.resize();
 	}
 
@@ -17,15 +18,31 @@ class Canvas {
 
 class Tools {
 	constructor() {
-		this.toolsBox = document.getElementById("tools");
-		this.navBar = document.getElementById("navbar");
+		this.toolsBox = document.createElement("tools");
+		this.toolsBox.id = "toolsBox";
+
+		this.navBar = document.createElement("navbar");
+		this.navBar.id = "navBar";
+
+
+
+		this.toolsBox.appendChild( this.navBar );
+		document.body.appendChild( this.toolsBox );
 
 		this.mouseDown = false;
 		this.mouseOffset = [ 0, 0 ];
 		this.offsetLimits = [ 0, 0 ];
 
+		this.buttons = [];
+		this.focused = -1;
+
 		this.updateOffsetLimits();
 	}
+
+	addButton( name ) {
+		this.buttons.push( Button( name ) );
+		
+	} 
 
 
 	//Update limits for moving the toolsbox, modify pos for it doesn't go out when we resize manually
@@ -60,4 +77,24 @@ class Tools {
 			this.toolsBox.style.top = Math.min( Math.max( event.clientY + this.mouseOffset[ 1 ], 0 ), this.offsetLimits[ 1 ] ) + 'px';
 		}
 	}
+}
+
+
+
+
+class Button {
+	constructor( id ) {
+		this.button = document.createElement("div")
+		this.button.id = id;
+		this.class = "button";
+	}
+
+	focus() {
+
+	}
+
+	unfocus() {
+
+	}
+
 }
