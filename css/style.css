@@ -32,29 +32,15 @@ body {
 }
 
 
-canvas {
-	width: 100%;
-	height: 100%;
+.drawing_canvas {
 	position: absolute;
 	z-index: -1;
 }
 
 
-table {
-	position:relative;
-	width: 100%;
-}
-
-
 .button {
 	position: absolute;
-	left: 50%;
-	top: 50%;
-	width: 50px;
-	height: 50px;
-	-ms-transform: translateY(-50%);
-	transform: translateY(-50%);
-	background-color: lightgrey;
+	background-color: grey;
 	border: none;
 	border-radius: 5px;
 }
@@ -62,19 +48,34 @@ table {
 
 
 .button:hover {
-	background-color: grey;
+	background-color: dimgrey;
 	border: none;
 	border-radius: 5px;
 }
 
-
-
-td {
-	position: relative;
-	text-align: center;
-	padding-top: 25px;
-	padding-bottom: 25px;
+.focused {
+	background-color: khaki;
 }
+
+.focused:hover {
+	background-color: darkkhaki;
+}
+
+
+
+.colorpicker {
+	position: absolute;
+	width: 256px;
+	height: 200px;
+	background-color: darkgrey;
+}
+
+canvas > div {
+	position: absolute;
+	width: 5px;
+	background-color: white;
+}
+
 
 
 
@@ -82,16 +83,19 @@ td {
 	left: 0px;
 	top: 0px;
 	min-width: 200px;
-	min-height: 300px;
 	position: absolute;
 	background-color: black;
+	border: none;
+	border-radius: 10px;
 }
 
 #navBar {
-	background-color: grey;
+	background-color: lightgoldenrodyellow;
 	width: 100%;
 	height: 20px;
 	position: absolute;
-	left: 0;
-	top: 0;
+	left: 0px;
+	top: 0px;
+	border: none;
+	border-radius: 5px;
 }
