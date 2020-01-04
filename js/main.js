@@ -1,31 +1,10 @@
-var canvas;
 var tools;
-var openedWindows = [];
-
+var canvas;
 
 
 const main = () => {
-	canvas = new Canvas();
 	tools = new Tools();
-
-	pushWindow( new ColorPicker( 200, 100 ) ); //just for testing
-
-	window.addEventListener("resize", () => {
-		canvas.resize();
-		tools.updateOffsetLimits();
-	} );
-
-	document.body.addEventListener( "mousemove", (event) => {
-		tools.move( event );
-	} );
-
-	tools.navBar.addEventListener( "mousedown", (event) => {
-		tools.setMoveOffset( event );
-	} );
-
-	document.body.addEventListener( "mouseup", () => {
-		tools.mouseDown = false;
-	} );
+	canvas = new Canvas( tools );
 }
 
 
@@ -36,28 +15,26 @@ const handleInput = ( event ) => {
 		tools.focus( "selector" );
 	} else if( key == "p" ) {
 		tools.focus( "pencil" );
+	} else if( key == "e" ) {
+		tools.focus( "eraser" );
 	} else if( key == "l" ) {
 		tools.focus( "picker" );
 	} else if( key == "b" ) {
 		tools.focus( "bucketfill" );
-	} else if( key == "Escape" ) {
-		popWindow();
 	}
+
+	handleMod( event );
 }
 
-
-const pushWindow = ( object ) => {
-	openedWindows.push( object );
-	document.body.appendChild( openedWindows[openedWindows.length - 1].window );
-}
-
-const popWindow = () => {
-	if( openedWindows.length > 0 ) {
-		document.body.removeChild( openedWindows[openedWindows.length - 1].window );
-		openedWindows.pop();
+const handleMod = ( event ) => {
+	if( event.ctrlKey && tools.focused == "pencil" ) {
+		tools.focus( "picker" );
+	} else {
+		tools.focus( "pencil" );
 	}
 }
 
 
 window.addEventListener("keydown", handleInput);
+window.addEventListener("keyup", handleMod);
 window.addEventListener("load", main);

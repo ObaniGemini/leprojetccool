@@ -38,6 +38,7 @@ body {
 }
 
 
+
 .button {
 	position: absolute;
 	background-color: grey;
@@ -45,13 +46,13 @@ body {
 	border-radius: 5px;
 }
 
-
-
 .button:hover {
 	background-color: dimgrey;
 	border: none;
 	border-radius: 5px;
 }
+
+
 
 .focused {
 	background-color: khaki;
@@ -66,14 +67,16 @@ body {
 .colorpicker {
 	position: absolute;
 	width: 256px;
-	height: 200px;
+	height: 80px;
 	background-color: darkgrey;
 }
 
 canvas > div {
 	position: absolute;
-	width: 5px;
 	background-color: white;
+	width: 4px;
+	left: 0px;
+	top: 0px;
 }
 
 
@@ -90,7 +93,7 @@ canvas > div {
 }
 
 #navBar {
-	background-color: lightgoldenrodyellow;
+	background-color: olive;
 	width: 100%;
 	height: 20px;
 	position: absolute;
@@ -98,4 +101,26 @@ canvas > div {
 	top: 0px;
 	border: none;
 	border-radius: 5px;
+}
+
+input {
+	position: absolute;
+}
+
+#selectedArea {
+	position: absolute;
+	border: 4px dotted black;
+	animation-name: selectedArea;
+	animation-duration: 1s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
+
+@keyframes selectedArea {
+  from {
+  	border-style: dotted;
+  }
+  to {
+  	border-style: solid;
+  }
 }
