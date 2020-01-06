@@ -1,7 +1,7 @@
 class Canvas {
 	constructor( tools ) {
 		this.tools = tools;
-		this.selector = new Selector();
+		this.selector = new Selector( this );
 		this.mouseDown = false;
 		this.lastMousePos = [ -1, -1 ];
 
@@ -16,37 +16,14 @@ class Canvas {
 		this.ctx.fillStyle = 'rgb( 255, 255, 255 )';
 		this.ctx.fillRect( 0, 0, screen.width, screen.height ); //Init this so that picker works
 
-		this.canvas.addEventListener( "mousedown", ( event ) => { this.startDrawing( event ) } );
-		window.addEventListener( 	  "mouseup",   ( event ) => { this.stopDrawing( event ) } );
-		this.canvas.addEventListener( "mousemove", ( event ) => { this.draw( event ) } );
+		this.canvas.addEventListener( "mousedown", ( event ) => { this.startDrawing( event.clientX, event.clientY ) } );
+		window.addEventListener( 	  "mouseup",   () => 		{ this.stopDrawing() } );
+		this.canvas.addEventListener( "mousemove", ( event ) => { this.draw( event.clientX, event.clientY ) } );
+
+		this.selector.window.addEventListener( "mousedown", ( event ) => { this.startDrawing( event.clientX, event.clientY ) } );
+		this.selector.window.addEventListener( "mousemove", ( event ) => { this.draw( event.clientX, event.clientY ) } );
 	}
 
-
-
-
-	startDrawing( event ) {
-		this.ctx.lineWidth = parseInt( this.tools.pencilSize.value );
-
-		if( this.tools.focused == "selector") {
-			this.selector.remove();
-		} else if( this.tools.focused == "eraser" ) {
-			this.ctx.fillStyle = this.tools.backgroundColor.rgb;
-			this.ctx.strokeStyle = this.tools.backgroundColor.rgb;
-		} else {
-			this.ctx.fillStyle = this.tools.foregroungColor.rgb;
-			this.ctx.strokeStyle = this.tools.foregroungColor.rgb;
-		}
-
-		this.lastMousePos = [ event.layerX, event.layerY ];
-		this.mouseDown = true;
-		this.draw( event );
-	}
-
-
-	stopDrawing( event ) {
-		this.mouseDown = false;
-		this.lastMousePos = [ -1, -1 ];
-	}
 
 
 
@@ -58,26 +35,62 @@ class Canvas {
 
 
 
-	draw( event ) {
+
+	startDrawing( posX, posY ) {
+		this.ctx.lineWidth = parseInt( this.tools.pencilSize.value );
+
+		if( this.tools.focused == "selector") {
+			if( this.selector.contains( posX, posY ) ) {
+				this.selector.select( posX, posY );
+			} else {
+				this.selector.remove();
+			}
+		} else if( this.tools.focused == "eraser" ) {
+			this.ctx.fillStyle = this.tools.backgroundColor.rgb;
+			this.ctx.strokeStyle = this.tools.backgroundColor.rgb;
+		} else {
+			this.ctx.fillStyle = this.tools.foregroungColor.rgb;
+			this.ctx.strokeStyle = this.tools.foregroungColor.rgb;
+		}
+
+		this.mouseDown = true;
+		this.lastMousePos = [ posX, posY ];
+		this.draw( posX, posY );
+	}
+
+
+
+
+	stopDrawing() {
+		this.mouseDown = false;
+		this.lastMousePos = [ -1, -1 ];
+		this.selector.unselect();
+	}
+
+
+
+
+	draw( posX, posY ) {
 		if( !this.mouseDown )
 			return;
 
-		let X = event.clientX;
-		let Y = event.clientY;
-
+		let X = posX;
+		let Y = posY;
 
 		if( this.tools.focused == "selector" ) {
-			if( this.selector.enabled ) {
+			if( this.selector.selected ) {
+				this.selector.move( X, Y );
+			}
+			else if( this.selector.enabled ) {
 				this.selector.update( X, Y );
-			} else if( this.lastMousePos[ 0 ] != X || this.lastMousePos[ 1 ] != Y ) {
+			}
+			else if( this.lastMousePos[ 0 ] != X || this.lastMousePos[ 1 ] != Y ) {
 				this.selector.add( X, Y );
 			}
 		}
 
 
-		else if( this.selector.enabled &&
-			   ( X < this.selector.X1 || X > this.selector.X2 || Y < this.selector.Y1 || Y > this.selector.Y2 ) )
-		{
+		else if( this.selector.enabled && !this.selector.contains( X, Y ) ) {
 			return;
 		}
 

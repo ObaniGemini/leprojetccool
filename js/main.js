@@ -27,9 +27,17 @@ const handleInput = ( event ) => {
 }
 
 const handleMod = ( event ) => {
+	if( event.ctrlKey && tools.focused == "selector" ) {
+		if( event.key == "c" ) {
+			canvas.selector.copySelection();
+		} else if( event.key == "v" ) {
+			canvas.selector.pasteSelection();
+		}
+	}
+
 	if( event.ctrlKey && tools.focused == "pencil" ) {
 		tools.focus( "picker" );
-	} else {
+	} else if( tools.focused == "picker" ) {
 		tools.focus( "pencil" );
 	}
 }

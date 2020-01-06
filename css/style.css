@@ -109,7 +109,7 @@ input {
 
 #selectedArea {
 	position: absolute;
-	border: 4px dotted black;
+	border: 1px inset black;
 	animation-name: selectedArea;
 	animation-duration: 1s;
 	animation-timing-function: linear;
@@ -118,9 +118,9 @@ input {
 
 @keyframes selectedArea {
   from {
-  	border-style: dotted;
+  	border-style: inset;
   }
   to {
-  	border-style: solid;
+  	border-style: outset;
   }
 }
