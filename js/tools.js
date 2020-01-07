@@ -6,6 +6,7 @@ class Tools {
 		this.navBar = document.createElement("navbar");
 		this.navBar.id = "navBar";
 
+		this.canvas = null;
 
 		this.toolsBox.appendChild( this.navBar );
 		document.body.appendChild( this.toolsBox );
@@ -24,6 +25,7 @@ class Tools {
 		this.focused = "";
 
 
+		//Tools
 		this.addButton( "selector" );
 		this.addButton( "pencil" );
 		this.addButton( "eraser" );
@@ -33,32 +35,64 @@ class Tools {
 
 
 
+		//Color pickers, background and foreground
 		this.foregroungColor = new ColorPicker( 'rgb( 0, 0, 0 )', this.buttonWidth, parseInt( this.toolsBox.style.height ) + this.buttonWidth/2, this.buttonWidth );
 		this.backgroundColor = new ColorPicker( 'rgb( 255, 255, 255 )', this.buttonWidth*2, parseInt( this.toolsBox.style.height ) + this.buttonWidth/2, this.buttonWidth );
 
 		this.connectColorPicker( [ this.foregroungColor, this.backgroundColor ] );
 
 
-		this.toolsBox.style.height = ( parseInt( this.toolsBox.style.height ) + this.buttonWidth*3 ) + 'px';
+		this.toolsBox.style.height = ( parseInt( this.toolsBox.style.height ) + this.buttonWidth*4 ) + 'px';
 
 		this.toolsBox.appendChild( this.foregroungColor.button );
 		this.toolsBox.appendChild( this.backgroundColor.button );
 
+
+		//Pencil size input
 		this.pencilSize = document.createElement("input")
 		this.pencilSize.type = "number";
 		this.pencilSize.value = "5";
-		this.pencilSize.style.top = ( parseInt( this.toolsBox.style.height ) - this.buttonWidth ) + 'px';
+		this.pencilSize.style.top = ( parseInt( this.toolsBox.style.height ) - this.buttonWidth*2 ) + 'px';
 		this.toolsBox.appendChild( this.pencilSize );
+
+
+		//Save button
+		let save = document.createElement("button");
+		save.innerText = "Save to desktop";
+		save.type = "button";
+		save.style.top = ( parseInt( this.toolsBox.style.height ) - this.buttonWidth ) + 'px';
+		this.toolsBox.appendChild( save );
+		save.style.left = ( this.toolsBox.offsetWidth - save.offsetWidth )/2 + 'px';
+
 
 		this.updateOffsetLimits();
 		this.focus( "pencil" );
 
-		window.addEventListener("resize", () => { this.updateOffsetLimits() } );
-		document.body.addEventListener( "mousemove", (event) => { this.move( event ) } );
-		this.navBar.addEventListener( "mousedown", (event) => { this.setMoveOffset( event ) } );
-		document.body.addEventListener( "mouseup", () => { tools.mouseDown = false } );
-		document.body.addEventListener( "mouseleave", () => { tools.mouseDown = false } );
+		//Toolbox handlers
+		window.addEventListener(		"resize",		() 		=> { this.updateOffsetLimits() } );
+		document.body.addEventListener( "mousemove",	(event) => { this.move( event ) } );
+		this.navBar.addEventListener(	"mousedown",	(event) => { this.setMoveOffset( event ) } );
+		document.body.addEventListener( "mouseup",		() 		=> { this.mouseDown = false } );
+		document.body.addEventListener( "mouseleave",	() 		=> { this.mouseDown = false } );
+		save.addEventListener(			"mousedown",	() 		=> { this.saveImage() } );
 	}
+
+
+
+	linkCanvas( canvas ) {
+		this.canvas = canvas;
+	}
+
+
+
+	saveImage() {
+		if( this.canvas != null ) {
+			this.canvas.saveImage();
+		} else {
+			console.log("The canvas doesn't exist !");
+		}
+	}
+
 
 
 

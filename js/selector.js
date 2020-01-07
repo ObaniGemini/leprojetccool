@@ -1,3 +1,5 @@
+//Our selector tool
+
 class Selector {
 	constructor( canvas ) {
 		this.canvas = canvas;

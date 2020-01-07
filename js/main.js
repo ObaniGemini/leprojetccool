@@ -2,12 +2,17 @@ var tools;
 var canvas;
 
 
+//The beginning
 const main = () => {
 	tools = new Tools();
 	canvas = new Canvas( tools );
+
+	tools.linkCanvas( canvas );
 }
 
 
+
+//handle input shortcuts
 const handleInput = ( event ) => {
 	let key = event.key;
 
@@ -26,21 +31,25 @@ const handleInput = ( event ) => {
 	handleMod( event );
 }
 
+
+
+//handle bindings with Ctrl
 const handleMod = ( event ) => {
-	if( event.ctrlKey && tools.focused == "selector" ) {
-		if( event.key == "c" ) {
-			canvas.selector.copySelection();
-		} else if( event.key == "v" ) {
-			canvas.selector.pasteSelection();
-		}
+	if( event.ctrlKey && tools.focused == "selector" && event.key == "c" ) {
+		canvas.selector.copySelection();
+	} else if( event.ctrlKey && event.key == "v" ) {
+		tools.focus("selector");
+		canvas.selector.pasteSelection();
 	}
 
-	if( event.ctrlKey && tools.focused == "pencil" ) {
+	else if( event.ctrlKey && tools.focused == "pencil" ) {
 		tools.focus( "picker" );
 	} else if( tools.focused == "picker" ) {
 		tools.focus( "pencil" );
 	}
 }
+
+
 
 
 window.addEventListener("keydown", handleInput);

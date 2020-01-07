@@ -27,6 +27,14 @@ class Canvas {
 
 
 
+	saveImage() { //Found on stackoverflow
+		let image = this.canvas.toDataURL("image/png", 1.0);
+		window.location.href = image;
+	}
+
+
+
+	//Pick color on [X|Y] pixel on canvas
 	pickColor( x, y ) {
 		let pixel = this.ctx.getImageData( x, y, 1, 1 );
 		let c = pixel.data;
@@ -35,7 +43,7 @@ class Canvas {
 
 
 
-
+	//Init values for drawing (on mousedown)
 	startDrawing( posX, posY ) {
 		this.ctx.lineWidth = parseInt( this.tools.pencilSize.value );
 
@@ -60,7 +68,7 @@ class Canvas {
 
 
 
-
+	//Disable drawing abilities
 	stopDrawing() {
 		this.mouseDown = false;
 		this.lastMousePos = [ -1, -1 ];
@@ -70,6 +78,7 @@ class Canvas {
 
 
 
+	//Drawing functions
 	draw( posX, posY ) {
 		if( !this.mouseDown )
 			return;
@@ -77,6 +86,7 @@ class Canvas {
 		let X = posX;
 		let Y = posY;
 
+		//Selector
 		if( this.tools.focused == "selector" ) {
 			if( this.selector.selected ) {
 				this.selector.move( X, Y );
@@ -95,6 +105,7 @@ class Canvas {
 		}
 
 
+		//Pencil/Eraser
 		else if( this.tools.focused == "pencil" || this.tools.focused == "eraser" ) {
 			if( this.lastMousePos[ 0 ] != -1 ) {
 				this.ctx.beginPath();
@@ -111,10 +122,8 @@ class Canvas {
 		}
 
 
+		//Color picker
 		else if( this.tools.focused == "picker" ) {
-			let fillColor = [ parseInt( (this.ctx.fillStyle.split(','))[ 0 ] ), parseInt( (this.ctx.fillStyle.split(','))[ 1 ] ), parseInt( (this.ctx.fillStyle.split(','))[ 2 ] ) ];
-			console.log(fillColor);
-			console.log(this.ctx.fillStyle.split(','))
 			let c = this.pickColor( X, Y );
 			console.log( 'Picked color rgb( ' + c[0] + ', ' + c[1] + ', ' + c[2] + ' )' );
 
@@ -123,17 +132,20 @@ class Canvas {
 		}
 
 
+		//Bucketfill (very slow)
 		else if( this.tools.focused == "bucketfill" ) {
-
-			let fillColor = [ parseInt( this.ctx.fillStyle.split(',')[ 0 ] ), parseInt( this.ctx.fillStyle.split(',')[ 1 ] ), parseInt( this.ctx.fillStyle.split(',')[ 2 ] ) ];
-			console.log( fillColor );
+			let fillColor = [ util.hexToDec( this.ctx.fillStyle.substring( 1, 3 ) ), util.hexToDec( this.ctx.fillStyle.substring( 3, 5 ) ), util.hexToDec( this.ctx.fillStyle.substring( 5, 7 ) ) ];
 			let toFillColor = this.pickColor( X, Y );
+
+			if( fillColor[ 0 ] == toFillColor[ 0 ] && fillColor[ 1 ] == toFillColor[ 1 ] && fillColor[ 2 ] == toFillColor[ 2 ] ) {
+				return;
+			}
+
 			let W = this.canvas.width;
 			let H = this.canvas.height;
 
-			let tmp_img = this.ctx.getImageData( 0, 0, W, H );
+			let fullImage = this.ctx.getImageData( 0, 0, W, H );
 
-			let fullImage = tmp_img.data;
 			let visited = [ X + Y*W ];
 			let toCheck = [ (X-1) + W*Y, X + W*(Y-1), (X+1) + W*Y, X + W*(Y+1) ];
 
@@ -146,7 +158,7 @@ class Canvas {
 					}
 
 					let pos = element*4;
-					if( fullImage[ pos ] == toFillColor[ 0 ] && fullImage[ pos + 1 ] == toFillColor[ 1 ] && fullImage[ pos + 2 ] == toFillColor[ 2 ] ) {
+					if( fullImage.data[ pos ] == toFillColor[ 0 ] && fullImage.data[ pos + 1 ] == toFillColor[ 1 ] && fullImage.data[ pos + 2 ] == toFillColor[ 2 ] ) {
 						visited.push( element );
 
 						toCheck.push( element - 1 ); // X - 1
@@ -163,9 +175,9 @@ class Canvas {
 
 			visited.forEach( ( element ) => {
 				let pos = element*4;
-				fullImage[ pos ] 	 = fillColor[ 0 ];
-				fullImage[ pos + 1 ] = fillColor[ 1 ];
-				fullImage[ pos + 2 ] = fillColor[ 2 ];
+				fullImage.data[ pos ] 	  = fillColor[ 0 ];
+				fullImage.data[ pos + 1 ] = fillColor[ 1 ];
+				fullImage.data[ pos + 2 ] = fillColor[ 2 ];
 			} );
 
 			this.ctx.putImageData( fullImage, 0, 0 );

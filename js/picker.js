@@ -1,3 +1,5 @@
+//Our color picker, and picker window (when opened)
+
 class ColorPicker {
 	constructor( initRGB, posX, posY, size ) {
 		this.rgb = initRGB;
@@ -48,7 +50,7 @@ class ColorPicker {
 class PickerWindow {
 	constructor( posY, posX, rgb ) {
 		this.sliderHeight = 25;
-		this.cursorColor = 'rgb( 220, 220, 220 )';
+		this.cursorColor = 'rgb( 200, 200, 200 )';
 
 		this.window = document.createElement( "div" );
 		this.window.className = "colorpicker";
@@ -57,10 +59,11 @@ class PickerWindow {
 
 		this.posX = posX;
 		this.value = [ 0, 0, 0 ];
-		rgb.split(',').forEach( ( element, idx ) => { this.value[ idx ] = parseInt( element ); } );
+	
+		rgb.split(',').forEach( ( element, idx ) => { this.value[ idx ] = ( idx == 0 ? parseInt( element.substring( 4, 8 ) ) : parseInt( element ) ) } ); //hardfix
 
 
-		this.mousedown = false;
+		this.mouseDown = false;
 		this.focused = 0;
 
 
@@ -69,7 +72,6 @@ class PickerWindow {
 			canvas.setAttribute( "width", "256px" );
 			canvas.setAttribute( "height", this.sliderHeight + 'px' );
 			let context = canvas.getContext( "2d" );
-
 
 			let rgb1 = 'rgb( ';
 			let rgb2 = '';
@@ -81,10 +83,10 @@ class PickerWindow {
 			}
 
 			for( let i = 0; i < 256; i++ ) {
-				if( i >= this.value[ idx ] - 2 && i <= this.value[ idx ] + 2 ) {
+				if( i >= this.value[ idx ] - 2 && i < this.value[ idx ] + 2 ) {
 					context.fillStyle = this.cursorColor;
-					context.fillRect( Math.max( 0, this.value[ idx ] - 2 ), 0, 4, this.sliderHeight );
-					i += 4;
+					context.fillRect( this.value[ idx ] - 2, 0, 4, this.sliderHeight );
+					i += Math.min( 4, this.value[ idx ] + 1 );
 				} else {
 					context.fillStyle = rgb1 + i + rgb2;
 					context.fillRect( i, 0, 1, this.sliderHeight );
@@ -92,7 +94,7 @@ class PickerWindow {
 			}
 
 			canvas.addEventListener( "mousedown", ( event ) => {
-				this.mousedown = true;
+				this.mouseDown = true;
 				this.focused = idx;
 				this.updateGradient( event );
 			} );
@@ -100,10 +102,10 @@ class PickerWindow {
 				this.updateGradient( event );
 			} );
 			window.addEventListener( "mouseup", () => {
-				this.mousedown = false;
+				this.mouseDown = false;
 			} );
 			document.body.addEventListener( "mouseleave", () => {
-				this.mousedown = false;
+				this.mouseDown = false;
 			} );
 
 
@@ -115,7 +117,7 @@ class PickerWindow {
 
 
 	updateGradient( event ) {
-		if( this.mousedown ) {
+		if( this.mouseDown ) {
 			let idx = this.focused;
 			let rgb1 = 'rgb( ';
 			let rgb2 = '';
@@ -129,7 +131,7 @@ class PickerWindow {
 				rgb2 += ( i == 2 ? ' )' : ', 0' );
 			}
 
-			let max = Math.min( this.value[ idx ] + 2, 255 );
+			let max = Math.min( this.value[ idx ] + 2, 256 );
 			for( let i = this.value[ idx ] - 2; i < max; i++ ) {
 				context.fillStyle = rgb1 + this.value[ idx ] + rgb2; //Removing the cursor
 				context.fillRect( i, 0, 1, this.sliderHeight );
@@ -138,7 +140,7 @@ class PickerWindow {
 			this.value[ idx ] = Math.max( Math.min( event.x - this.posX, 255 ), 0 );
 
 			context.fillStyle = this.cursorColor; //Setting the cursor
-			context.fillRect( Math.max( 0, this.value[ idx ] - 2 ) , 0, 4, this.sliderHeight );
+			context.fillRect( this.value[ idx ] - 2, 0, 4, this.sliderHeight );
 		}
 	}
 }
